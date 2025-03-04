@@ -61,16 +61,44 @@ export function evaluateHand(hand: Hand): HandEvaluation {
         rankCounts.set(value, (rankCounts.get(value) || 0) + 1);
     });
 
-    // Check for three of a kind
+    // Check for four of a kind
     for (const [value, count] of rankCounts.entries()) {
-        if (count === 3) {
+        if (count === 4) {
             const kickers = rankValues.filter(v => v !== value);
             return {
-                rank: 'THREE_OF_A_KIND',
+                rank: 'FOUR_OF_A_KIND',
                 value,
                 kickers
             };
         }
+    }
+
+    // Check for full house
+    let threeOfAKind: number | null = null;
+    let pair: number | null = null;
+    for (const [value, count] of rankCounts.entries()) {
+        if (count === 3) {
+            threeOfAKind = value;
+        } else if (count === 2) {
+            pair = value;
+        }
+    }
+    if (threeOfAKind !== null && pair !== null) {
+        return {
+            rank: 'FULL_HOUSE',
+            value: threeOfAKind,
+            kickers: [pair]
+        };
+    }
+
+    // Check for three of a kind
+    if (threeOfAKind !== null) {
+        const kickers = rankValues.filter(v => v !== threeOfAKind);
+        return {
+            rank: 'THREE_OF_A_KIND',
+            value: threeOfAKind,
+            kickers
+        };
     }
 
     // Check for two pairs

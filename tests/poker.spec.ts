@@ -130,5 +130,35 @@ describe('Poker Hand Evaluation', () => {
             expect(evaluation.value).toBe(14); // Highest card in the flush
             expect(evaluation.kickers).toEqual([8, 6, 4, 2]); // Remaining cards in order
         });
+
+        it('should evaluate full house', () => {
+            const hand = createHand([
+                createCard('♥', 'A'),
+                createCard('♠', 'A'),
+                createCard('♦', 'A'),
+                createCard('♣', 'K'),
+                createCard('♥', 'K')
+            ]);
+
+            const evaluation = evaluateHand(hand);
+            expect(evaluation.rank).toBe('FULL_HOUSE');
+            expect(evaluation.value).toBe(14); // Value of the three of a kind (Aces)
+            expect(evaluation.kickers).toEqual([13]); // Value of the pair (Kings)
+        });
+
+        it('should evaluate four of a kind', () => {
+            const hand = createHand([
+                createCard('♥', 'A'),
+                createCard('♠', 'A'),
+                createCard('♦', 'A'),
+                createCard('♣', 'A'),
+                createCard('♥', 'K')
+            ]);
+
+            const evaluation = evaluateHand(hand);
+            expect(evaluation.rank).toBe('FOUR_OF_A_KIND');
+            expect(evaluation.value).toBe(14); // Value of the four of a kind (Aces)
+            expect(evaluation.kickers).toEqual([13]); // Value of the kicker (King)
+        });
     });
 }); 
