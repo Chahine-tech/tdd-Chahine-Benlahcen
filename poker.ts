@@ -33,19 +33,45 @@ export function evaluateHand(hand: Hand): HandEvaluation {
         rankCounts.set(value, (rankCounts.get(value) || 0) + 1);
     });
 
-    // Check for one pair
+    // Check for three of a kind
     for (const [value, count] of rankCounts.entries()) {
-        if (count === 2) {
+        if (count === 3) {
             const kickers = rankValues.filter(v => v !== value);
             return {
-                rank: 'ONE_PAIR',
+                rank: 'THREE_OF_A_KIND',
                 value,
                 kickers
             };
         }
     }
 
-    // If no pair, it's a high card
+    // Check for two pairs
+    const pairs: number[] = [];
+    for (const [value, count] of rankCounts.entries()) {
+        if (count === 2) {
+            pairs.push(value);
+        }
+    }
+    if (pairs.length === 2) {
+        const kickers = rankValues.filter(v => !pairs.includes(v));
+        return {
+            rank: 'TWO_PAIR',
+            value: Math.max(...pairs),
+            kickers: [Math.min(...pairs), ...kickers]
+        };
+    }
+
+    // Check for one pair
+    if (pairs.length === 1) {
+        const kickers = rankValues.filter(v => v !== pairs[0]);
+        return {
+            rank: 'ONE_PAIR',
+            value: pairs[0],
+            kickers
+        };
+    }
+
+    // If no combination, it's a high card
     return {
         rank: 'HIGH_CARD',
         value: rankValues[0],

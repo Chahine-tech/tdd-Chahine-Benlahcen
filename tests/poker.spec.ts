@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Card, Hand, HandRank } from '../types';
+import { Card, Hand } from '../types';
 import { createCard, createHand, evaluateHand } from '../poker';
 
 describe('Poker Hand Evaluation', () => {
@@ -54,6 +54,36 @@ describe('Poker Hand Evaluation', () => {
             expect(evaluation.rank).toBe('ONE_PAIR');
             expect(evaluation.value).toBe(14); // Value of the pair (Aces)
             expect(evaluation.kickers).toEqual([13, 12, 11]); // Values of remaining cards
+        });
+
+        it('should evaluate two pairs', () => {
+            const hand = createHand([
+                createCard('♥', 'A'),
+                createCard('♠', 'A'),
+                createCard('♦', 'K'),
+                createCard('♣', 'K'),
+                createCard('♥', 'Q')
+            ]);
+
+            const evaluation = evaluateHand(hand);
+            expect(evaluation.rank).toBe('TWO_PAIR');
+            expect(evaluation.value).toBe(14); // Value of the highest pair (Aces)
+            expect(evaluation.kickers).toEqual([13, 12]); // Value of the second pair and kicker
+        });
+
+        it('should evaluate three of a kind', () => {
+            const hand = createHand([
+                createCard('♥', 'A'),
+                createCard('♠', 'A'),
+                createCard('♦', 'A'),
+                createCard('♣', 'K'),
+                createCard('♥', 'Q')
+            ]);
+
+            const evaluation = evaluateHand(hand);
+            expect(evaluation.rank).toBe('THREE_OF_A_KIND');
+            expect(evaluation.value).toBe(14); // Value of the three of a kind (Aces)
+            expect(evaluation.kickers).toEqual([13, 12]); // Values of remaining cards
         });
     });
 }); 
