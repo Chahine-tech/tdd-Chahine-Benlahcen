@@ -160,5 +160,35 @@ describe('Poker Hand Evaluation', () => {
             expect(evaluation.value).toBe(14); // Value of the four of a kind (Aces)
             expect(evaluation.kickers).toEqual([13]); // Value of the kicker (King)
         });
+
+        it('should evaluate straight flush', () => {
+            const hand = createHand([
+                createCard('♠', '9'),
+                createCard('♠', '8'),
+                createCard('♠', '7'),
+                createCard('♠', '6'),
+                createCard('♠', '5')
+            ]);
+
+            const evaluation = evaluateHand(hand);
+            expect(evaluation.rank).toBe('STRAIGHT_FLUSH');
+            expect(evaluation.value).toBe(9); // Highest card in the straight flush
+            expect(evaluation.kickers).toEqual([]); // No kickers for straight flush
+        });
+
+        it('should evaluate royal flush', () => {
+            const hand = createHand([
+                createCard('♥', 'A'),
+                createCard('♥', 'K'),
+                createCard('♥', 'Q'),
+                createCard('♥', 'J'),
+                createCard('♥', '10')
+            ]);
+
+            const evaluation = evaluateHand(hand);
+            expect(evaluation.rank).toBe('ROYAL_FLUSH');
+            expect(evaluation.value).toBe(14); // Value of Ace
+            expect(evaluation.kickers).toEqual([]); // No kickers for royal flush
+        });
     });
 }); 

@@ -51,6 +51,14 @@ function isFlush(hand: Hand): boolean {
     return hand.every(card => card.suit === hand[0].suit);
 }
 
+function isRoyalFlush(rankValues: number[]): boolean {
+    return rankValues.includes(14) && // Ace
+           rankValues.includes(13) && // King
+           rankValues.includes(12) && // Queen
+           rankValues.includes(11) && // Jack
+           rankValues.includes(10);   // Ten
+}
+
 export function evaluateHand(hand: Hand): HandEvaluation {
     // Get all rank values and sort them in descending order
     const rankValues = hand.map(card => getRankValue(card.rank)).sort((a, b) => b - a);
@@ -60,6 +68,32 @@ export function evaluateHand(hand: Hand): HandEvaluation {
     rankValues.forEach(value => {
         rankCounts.set(value, (rankCounts.get(value) || 0) + 1);
     });
+
+    // Check for royal flush
+    if (isFlush(hand) && isStraight(rankValues) && isRoyalFlush(rankValues)) {
+        return {
+            rank: 'ROYAL_FLUSH',
+            value: 14,
+            kickers: []
+        };
+    }
+
+    // Check for straight flush
+    if (isFlush(hand) && isStraight(rankValues)) {
+        // For Ace-low straight flush, the value is 5
+        if (rankValues.includes(14) && rankValues.includes(2)) {
+            return {
+                rank: 'STRAIGHT_FLUSH',
+                value: 5,
+                kickers: []
+            };
+        }
+        return {
+            rank: 'STRAIGHT_FLUSH',
+            value: rankValues[0],
+            kickers: []
+        };
+    }
 
     // Check for four of a kind
     for (const [value, count] of rankCounts.entries()) {
