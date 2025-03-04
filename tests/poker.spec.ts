@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { Card, Hand } from '../types';
-import { createCard, createHand, evaluateHand } from '../poker';
+import { createCard, createHand, evaluateHand, compareHands } from '../poker';
 
 describe('Poker Hand Evaluation', () => {
     it('should create a valid card', () => {
@@ -189,6 +189,113 @@ describe('Poker Hand Evaluation', () => {
             expect(evaluation.rank).toBe('ROYAL_FLUSH');
             expect(evaluation.value).toBe(14); // Value of Ace
             expect(evaluation.kickers).toEqual([]); // No kickers for royal flush
+        });
+    });
+
+    describe('Hand Comparison', () => {
+        it('should compare two pairs correctly', () => {
+            const hand1 = createHand([
+                createCard('♥', 'A'),
+                createCard('♠', 'A'),
+                createCard('♦', 'K'),
+                createCard('♣', 'K'),
+                createCard('♥', 'Q')
+            ]);
+
+            const hand2 = createHand([
+                createCard('♥', 'K'),
+                createCard('♠', 'K'),
+                createCard('♦', 'Q'),
+                createCard('♣', 'Q'),
+                createCard('♥', 'J')
+            ]);
+
+            const result = compareHands(hand1, hand2);
+            expect(result).toBe(1); // hand1 wins (higher pairs)
+        });
+
+        it('should compare full houses correctly', () => {
+            const hand1 = createHand([
+                createCard('♥', 'A'),
+                createCard('♠', 'A'),
+                createCard('♦', 'A'),
+                createCard('♣', 'K'),
+                createCard('♥', 'K')
+            ]);
+
+            const hand2 = createHand([
+                createCard('♥', 'K'),
+                createCard('♠', 'K'),
+                createCard('♦', 'K'),
+                createCard('♣', 'A'),
+                createCard('♥', 'A')
+            ]);
+
+            const result = compareHands(hand1, hand2);
+            expect(result).toBe(1); // hand1 wins (higher three of a kind)
+        });
+
+        it('should compare different hand types correctly', () => {
+            const hand1 = createHand([
+                createCard('♥', 'A'),
+                createCard('♠', 'A'),
+                createCard('♦', 'A'),
+                createCard('♣', 'K'),
+                createCard('♥', 'Q')
+            ]);
+
+            const hand2 = createHand([
+                createCard('♥', 'A'),
+                createCard('♠', 'A'),
+                createCard('♦', 'K'),
+                createCard('♣', 'K'),
+                createCard('♥', 'Q')
+            ]);
+
+            const result = compareHands(hand1, hand2);
+            expect(result).toBe(1); // hand1 wins (three of a kind beats two pairs)
+        });
+
+        it('should return 0 for equal hands', () => {
+            const hand1 = createHand([
+                createCard('♥', 'A'),
+                createCard('♠', 'A'),
+                createCard('♦', 'K'),
+                createCard('♣', 'K'),
+                createCard('♥', 'Q')
+            ]);
+
+            const hand2 = createHand([
+                createCard('♦', 'A'),
+                createCard('♣', 'A'),
+                createCard('♥', 'K'),
+                createCard('♠', 'K'),
+                createCard('♦', 'Q')
+            ]);
+
+            const result = compareHands(hand1, hand2);
+            expect(result).toBe(0); // hands are equal
+        });
+
+        it('should compare kickers when main values are equal', () => {
+            const hand1 = createHand([
+                createCard('♥', 'A'),
+                createCard('♠', 'A'),
+                createCard('♦', 'K'),
+                createCard('♣', 'Q'),
+                createCard('♥', 'J')
+            ]);
+
+            const hand2 = createHand([
+                createCard('♦', 'A'),
+                createCard('♣', 'A'),
+                createCard('♥', 'K'),
+                createCard('♠', 'Q'),
+                createCard('♦', '10')
+            ]);
+
+            const result = compareHands(hand1, hand2);
+            expect(result).toBe(1); // hand1 wins (higher kicker)
         });
     });
 }); 

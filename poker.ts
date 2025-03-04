@@ -5,6 +5,19 @@ const RANK_VALUES: Record<string, number> = {
     'J': 11, 'Q': 12, 'K': 13, 'A': 14
 };
 
+const HAND_RANK_VALUES: Record<string, number> = {
+    'HIGH_CARD': 1,
+    'ONE_PAIR': 2,
+    'TWO_PAIR': 3,
+    'THREE_OF_A_KIND': 4,
+    'STRAIGHT': 5,
+    'FLUSH': 6,
+    'FULL_HOUSE': 7,
+    'FOUR_OF_A_KIND': 8,
+    'STRAIGHT_FLUSH': 9,
+    'ROYAL_FLUSH': 10
+};
+
 export function createCard(suit: string, rank: string): Card {
     return {
         suit: suit as Card['suit'],
@@ -193,4 +206,31 @@ export function evaluateHand(hand: Hand): HandEvaluation {
         value: rankValues[0],
         kickers: rankValues.slice(1)
     };
+}
+
+export function compareHands(hand1: Hand, hand2: Hand): number {
+    const eval1 = evaluateHand(hand1);
+    const eval2 = evaluateHand(hand2);
+
+    // Compare hand ranks first
+    const rankDiff = HAND_RANK_VALUES[eval1.rank] - HAND_RANK_VALUES[eval2.rank];
+    if (rankDiff !== 0) {
+        return rankDiff;
+    }
+
+    // If ranks are equal, compare main values
+    if (eval1.value !== eval2.value) {
+        return eval1.value - eval2.value;
+    }
+
+    // If main values are equal, compare kickers
+    for (let i = 0; i < eval1.kickers.length; i++) {
+        const kickerDiff = eval1.kickers[i] - eval2.kickers[i];
+        if (kickerDiff !== 0) {
+            return kickerDiff;
+        }
+    }
+
+    // If everything is equal, return 0
+    return 0;
 } 
