@@ -29,4 +29,10 @@ pnpm install
 
 ```bash
 pnpm test
-``` 
+```
+
+## Running Coverage
+
+```bash
+pnpm coverage
+```
