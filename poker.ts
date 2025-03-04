@@ -5,6 +5,9 @@ const RANK_VALUES: Record<string, number> = {
     'J': 11, 'Q': 12, 'K': 13, 'A': 14
 };
 
+const VALID_SUITS = ['♥', '♦', '♠', '♣'] as const;
+const VALID_RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'] as const;
+
 const HAND_RANK_VALUES: Record<string, number> = {
     'HIGH_CARD': 1,
     'ONE_PAIR': 2,
@@ -19,6 +22,12 @@ const HAND_RANK_VALUES: Record<string, number> = {
 };
 
 export function createCard(suit: string, rank: string): Card {
+    if (!VALID_SUITS.includes(suit as typeof VALID_SUITS[number])) {
+        throw new Error('Invalid suit');
+    }
+    if (!VALID_RANKS.includes(rank as typeof VALID_RANKS[number])) {
+        throw new Error('Invalid rank');
+    }
     return {
         suit: suit as Card['suit'],
         rank: rank as Card['rank']
@@ -29,6 +38,14 @@ export function createHand(cards: Card[]): Hand {
     if (cards.length !== 5) {
         throw new Error('A hand must contain exactly 5 cards');
     }
+
+    // Check for duplicate cards
+    const cardStrings = cards.map(card => `${card.suit}${card.rank}`);
+    const uniqueCards = new Set(cardStrings);
+    if (uniqueCards.size !== 5) {
+        throw new Error('Duplicate cards are not allowed');
+    }
+
     return cards as Hand;
 }
 

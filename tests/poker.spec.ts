@@ -298,4 +298,55 @@ describe('Poker Hand Evaluation', () => {
             expect(result).toBe(1); // hand1 wins (higher kicker)
         });
     });
+
+    describe('Input Validation', () => {
+        describe('Card Validation', () => {
+            it('should throw error for invalid rank', () => {
+                expect(() => createCard('♥', '1')).toThrow();
+                expect(() => createCard('♥', '15')).toThrow();
+                expect(() => createCard('♥', 'X')).toThrow();
+            });
+
+            it('should throw error for invalid suit', () => {
+                expect(() => createCard('X', 'A')).toThrow();
+                expect(() => createCard('1', 'A')).toThrow();
+                expect(() => createCard('', 'A')).toThrow();
+            });
+        });
+
+        describe('Hand Validation', () => {
+            it('should throw error for hand with less than 5 cards', () => {
+                const cards = [
+                    createCard('♥', 'A'),
+                    createCard('♠', 'K'),
+                    createCard('♦', 'Q'),
+                    createCard('♣', 'J')
+                ];
+                expect(() => createHand(cards)).toThrow('A hand must contain exactly 5 cards');
+            });
+
+            it('should throw error for hand with more than 5 cards', () => {
+                const cards = [
+                    createCard('♥', 'A'),
+                    createCard('♠', 'K'),
+                    createCard('♦', 'Q'),
+                    createCard('♣', 'J'),
+                    createCard('♥', '10'),
+                    createCard('♠', '9')
+                ];
+                expect(() => createHand(cards)).toThrow('A hand must contain exactly 5 cards');
+            });
+
+            it('should throw error for hand with duplicate cards', () => {
+                const cards = [
+                    createCard('♥', 'A'),
+                    createCard('♥', 'A'), // Duplicate card
+                    createCard('♦', 'K'),
+                    createCard('♣', 'Q'),
+                    createCard('♥', 'J')
+                ];
+                expect(() => createHand(cards)).toThrow('Duplicate cards are not allowed');
+            });
+        });
+    });
 }); 
