@@ -85,5 +85,50 @@ describe('Poker Hand Evaluation', () => {
             expect(evaluation.value).toBe(14); // Value of the three of a kind (Aces)
             expect(evaluation.kickers).toEqual([13, 12]); // Values of remaining cards
         });
+
+        it('should evaluate straight', () => {
+            const hand = createHand([
+                createCard('♥', '9'),
+                createCard('♠', '8'),
+                createCard('♦', '7'),
+                createCard('♣', '6'),
+                createCard('♥', '5')
+            ]);
+
+            const evaluation = evaluateHand(hand);
+            expect(evaluation.rank).toBe('STRAIGHT');
+            expect(evaluation.value).toBe(9); // Highest card in the straight
+            expect(evaluation.kickers).toEqual([]); // No kickers for straight
+        });
+
+        it('should evaluate straight with Ace low', () => {
+            const hand = createHand([
+                createCard('♥', 'A'),
+                createCard('♠', '2'),
+                createCard('♦', '3'),
+                createCard('♣', '4'),
+                createCard('♥', '5')
+            ]);
+
+            const evaluation = evaluateHand(hand);
+            expect(evaluation.rank).toBe('STRAIGHT');
+            expect(evaluation.value).toBe(5); // Highest card in the straight
+            expect(evaluation.kickers).toEqual([]); // No kickers for straight
+        });
+
+        it('should evaluate flush', () => {
+            const hand = createHand([
+                createCard('♥', 'A'),
+                createCard('♥', '8'),
+                createCard('♥', '6'),
+                createCard('♥', '4'),
+                createCard('♥', '2')
+            ]);
+
+            const evaluation = evaluateHand(hand);
+            expect(evaluation.rank).toBe('FLUSH');
+            expect(evaluation.value).toBe(14); // Highest card in the flush
+            expect(evaluation.kickers).toEqual([8, 6, 4, 2]); // Remaining cards in order
+        });
     });
 }); 

@@ -23,6 +23,34 @@ export function getRankValue(rank: string): number {
     return RANK_VALUES[rank];
 }
 
+function isStraight(rankValues: number[]): boolean {
+    // Sort values in ascending order
+    const sortedValues = [...rankValues].sort((a, b) => a - b);
+    
+    // Check for regular straight
+    for (let i = 0; i < sortedValues.length - 4; i++) {
+        if (sortedValues[i + 4] - sortedValues[i] === 4) {
+            return true;
+        }
+    }
+    
+    // Check for Ace-low straight (A,2,3,4,5)
+    if (sortedValues.includes(14)) { // If we have an Ace
+        const aceLowValues = sortedValues.map(v => v === 14 ? 1 : v).sort((a, b) => a - b);
+        for (let i = 0; i < aceLowValues.length - 4; i++) {
+            if (aceLowValues[i + 4] - aceLowValues[i] === 4) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+function isFlush(hand: Hand): boolean {
+    return hand.every(card => card.suit === hand[0].suit);
+}
+
 export function evaluateHand(hand: Hand): HandEvaluation {
     // Get all rank values and sort them in descending order
     const rankValues = hand.map(card => getRankValue(card.rank)).sort((a, b) => b - a);
@@ -68,6 +96,32 @@ export function evaluateHand(hand: Hand): HandEvaluation {
             rank: 'ONE_PAIR',
             value: pairs[0],
             kickers
+        };
+    }
+
+    // Check for straight
+    if (isStraight(rankValues)) {
+        // For Ace-low straight, the value is 5
+        if (rankValues.includes(14) && rankValues.includes(2)) {
+            return {
+                rank: 'STRAIGHT',
+                value: 5,
+                kickers: []
+            };
+        }
+        return {
+            rank: 'STRAIGHT',
+            value: rankValues[0],
+            kickers: []
+        };
+    }
+
+    // Check for flush
+    if (isFlush(hand)) {
+        return {
+            rank: 'FLUSH',
+            value: rankValues[0],
+            kickers: rankValues.slice(1)
         };
     }
 
